@@ -11,10 +11,30 @@ function loadEventListeners() {
     const UISelectors = UICtrl.getSelectors();
     
     document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
-    document.querySelector(UISelectors.itemList).addEventListener('click', itemEditSubmit);
+    document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
+    document.querySelector(UISelectors.updateBtn).addEventListener('click', itemUpdateSubmit);
+    document.querySelector(UISelectors.deleteBtn).addEventListener('click', itemDeleteSubmit);
+    document.querySelector(UISelectors.backBtn).addEventListener('click', backEditState);
+    document.querySelector(UISelectors.clearBtn).addEventListener('click', clearSubmit);
+
+
+    document.addEventListener('keypress', function(e){
+        if(e.code === 'Enter'){
+            e.preventDefault();
+
+            const currentState = ItemCtrl.getCurrentState();
+
+            if(currentState === ItemCtrl.States.ADD)
+                itemAddSubmit();
+            else if (currentState === ItemCtrl.States.EDIT)
+                itemUpdateSubmit();
+        }
+
+            return false;
+    })
 }
 
-function itemEditSubmit(e) {
+function itemEditClick(e) {
     e.preventDefault();
 
     if(e.target.classList.contains('edit-item')) {
@@ -27,15 +47,48 @@ function itemEditSubmit(e) {
     }
 }
 
+function itemUpdateSubmit(e) {
+    if(e) e.preventDefault();
+
+    const itemUpdated = ItemCtrl.updateCurrentItem(UICtrl.getItemInput());
+    
+    if(itemUpdated){
+        UICtrl.updateList();
+        UICtrl.clearEditSate();
+    }
+}
+
 function itemAddSubmit(e){
-    e.preventDefault();
+    if(e) e.preventDefault();
+        
     const input = UICtrl.getItemInput();
 
-    if(input){
+    if(input.name && input.calories){
         ItemCtrl.addItem(input)
 
         UICtrl.updateList();
-
         UICtrl.clearInput();
+        UICtrl.focusName();
     }
+}
+
+function backEditState(e){
+    e.preventDefault();
+    UICtrl.clearEditSate();
+}
+
+function itemDeleteSubmit(e){
+    e.preventDefault();
+
+    ItemCtrl.deleteCurrentItem();
+    UICtrl.updateList();
+    UICtrl.clearEditSate();
+}
+
+function clearSubmit(e){
+    e.preventDefault();
+
+    ItemCtrl.clearItems();
+    UICtrl.updateList();
+    UICtrl.clearEditSate();
 }

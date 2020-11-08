@@ -8,7 +8,8 @@ const UISelectors = {
     backBtn: '.back-btn',
     itemName: '#item-name',
     itemCalories: '#item-calories',
-    totalCalories: '.total-calories'
+    totalCalories: '.total-calories',
+    clearBtn: '.clear-btn'
 }
 
 const nameInput = document.querySelector(UISelectors.itemName);
@@ -17,7 +18,6 @@ const updateBtn = document.querySelector(UISelectors.updateBtn);
 const deleteBtn = document.querySelector(UISelectors.deleteBtn);
 const backBtn = document.querySelector(UISelectors.backBtn);
 const addBtn = document.querySelector(UISelectors.addBtn);
-
 
 function populateItemlist(items) {
     let html = '';
@@ -37,14 +37,12 @@ export const getSelectors = () => UISelectors;
 
 export function getItemInput(){
     return {
-        name: nameInput.value,
-        calories: caloriesInput.value
+        name: nameInput.value.trim(),
+        calories: parseInt(caloriesInput.value)
     }
 }
 
 export function updateList(){
-    const items = ItemCtrl.getItems();
-
     populateItemlist(ItemCtrl.getItems());
     
     document.querySelector(UISelectors.totalCalories).textContent = ItemCtrl.getTotalCalories();
@@ -61,6 +59,10 @@ export function clearEditSate() {
     deleteBtn.style.display = 'none';
     backBtn.style.display = 'none';
     addBtn.style.display = 'inline';
+
+    ItemCtrl.clearCurrentItem();
+    ItemCtrl.setCurrentState(ItemCtrl.States.ADD);
+    focusName();
 }
 
 export function showEditSate() {
@@ -68,6 +70,9 @@ export function showEditSate() {
     deleteBtn.style.display = 'inline';
     backBtn.style.display = 'inline';
     addBtn.style.display = 'none';
+    
+    ItemCtrl.setCurrentState(ItemCtrl.States.EDIT);
+    focusName();
 }
 
 export function addItemToForm(){
@@ -75,4 +80,8 @@ export function addItemToForm(){
     caloriesInput.value = ItemCtrl.getCurrentItem().calories;
 
     showEditSate();
+}
+
+export function focusName(){
+    nameInput.focus();
 }
